@@ -2,18 +2,20 @@ require 'sizeable/resizer'
 require 'rack/request'
 
 describe Sizeable::Resizer do
+  before(:each) do
+    AWS::S3::S3Object.stub!(:find => mock(:s3_object, :value => '', :content_type => ''))
+    Magick::Image.stub!(:from_blob => [])
+    
+    AWS::S3::Base.stub!(:establish_connection!)
+    
+    @width = rand(100)
+    @height = rand(100)
+  end
+  
   describe ".new(Rack::Request)" do
     before(:each) do
-      @width = rand(100)
-      @height = rand(100)
-      
       @env = {'rack.input' => '', 'QUERY_STRING' => ''}
       
-      AWS::S3::S3Object.stub!(:find => mock(:s3_object, :value => '', :content_type => ''))
-      Magick::Image.stub!(:from_blob)
-      
-      AWS::S3::Base.stub!(:establish_connection!)
-
       @path = mock(:path).to_s
       @env.merge!({'PATH_INFO' => "/#{@path}"})
     end
@@ -35,7 +37,7 @@ describe Sizeable::Resizer do
       end
       
       it "fetches the original file and stores it as an RMagick file" do
-        Magick::Image.stub!(:from_blob).with(@blob).and_return(image = mock(:image))
+        Magick::Image.stub!(:from_blob).with(@blob).and_return([image = mock(:image)])
 
         resizer = Sizeable::Resizer.new(Rack::Request.new(@env))
         resizer.instance_variable_get('@image').should == image
@@ -57,6 +59,24 @@ describe Sizeable::Resizer do
   end
   
   describe "#resize!" do
+    before(:each) do
+      @image = mock(:image)
+
+      @resizer = Sizeable::Resizer.new(mock(:request, :params => {}, :path_info => ''))
+      @resizer.instance_variable_set('@width', @width)
+      @resizer.instance_variable_set('@height', @height)
+      @resizer.instance_variable_set('@image', @image)
+    end
     
+    it "confines the given image to the given height and width" do
+      new_image = mock(:new_image, :to_blob => (new_image_blob = mock(:image_blob)))
+      
+      @image.stub!(:resize_to_fit).with(@width, @height).and_return(new_image)
+      
+      @resizer.resize!
+      
+      @resizer.instance_variable_get('@image').should == new_image
+      @resizer.instance_variable_get('@image_blob').should == new_image_blob
+    end
   end
 end

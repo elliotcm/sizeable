@@ -11,8 +11,9 @@ module Sizeable
       connect_to_s3
       begin
         s3_object = AWS::S3::S3Object.find(image_name(request.path_info), s3_bucket)
+        
         @image_blob = s3_object.value
-        @image = Magick::Image.from_blob(@image_blob)
+        @image = Magick::Image.from_blob(@image_blob).first
         
         @content_type = s3_object.content_type
       rescue AWS::S3::NoSuchKey => e
@@ -23,7 +24,9 @@ module Sizeable
     attr_reader :image_blob, :content_type
     
     def resize!
-      
+      return if missing_boundary
+      @image = @image.resize_to_fit(@width, @height)
+      @image_blob = @image.to_blob
     end
     
     private
@@ -40,6 +43,10 @@ module Sizeable
     
     def image_name(path)
       path.slice(1, path.length)
+    end
+    
+    def missing_boundary
+      @width.nil? or @height.nil? or @width == 0 or @height == 0
     end
   end
   
