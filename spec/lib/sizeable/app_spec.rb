@@ -33,25 +33,23 @@ describe Sizeable::App do
     end
     
     context "image resizing" do
-      def request_path(path)
-        Sizeable::App.new.call({'PATH_INFO' => path})
+      def do_request
+        Sizeable::App.new.call({})
       end
       
       before(:each) do
-        @path = mock(:path)
-
-        @resizer = Sizeable::Resizer.new(@path)
+        @resizer = Sizeable::Resizer.new(mock(:request))
         Sizeable::Resizer.stub!(:new => @resizer)
       end
 
-      it "converts the requested path to a (potentially resized) image" do
+      it "converts the requested request to a (potentially resized) image" do
         @resizer.should_receive(:resize!)
-        request_path(@path)
+        do_request
       end
 
       it "returns the new image as the body of the response" do
         @resizer.stub!(:image_blob => (@image_blob = mock(:image_blob).to_s))
-        request_path(@path)[2].body.should == [@image_blob]
+        do_request[2].body.should == [@image_blob]
       end
     end
   end
