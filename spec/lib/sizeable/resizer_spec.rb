@@ -15,7 +15,7 @@ describe Sizeable::Resizer do
       AWS::S3::Base.stub!(:establish_connection!)
 
       @path = mock(:path).to_s
-      @env.merge!({'PATH_INFO' => @path})
+      @env.merge!({'PATH_INFO' => "/#{@path}"})
     end
 
     it "parses the params for target size" do
