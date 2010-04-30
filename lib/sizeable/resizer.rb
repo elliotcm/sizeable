@@ -5,8 +5,7 @@ require 'RMagick'
 module Sizeable
   class Resizer
     def initialize(request)
-      @width = request.params['width'].to_i
-      @height = request.params['height'].to_i
+      raise NoSuchImageException.new if image_name(request.path_info) == ''
       
       connect_to_s3
       begin
@@ -19,6 +18,9 @@ module Sizeable
       rescue AWS::S3::NoSuchKey => e
         raise NoSuchImageException.new
       end
+
+      @width = request.params['width'].to_i
+      @height = request.params['height'].to_i
     end
     
     attr_reader :image_blob, :content_type
