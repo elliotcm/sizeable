@@ -10,10 +10,20 @@ module Sizeable
         resizer = Resizer.new(Rack::Request.new(env))
         resizer.resize!
         
-        Rack::Response.new(resizer.image_blob, 200, {"Content-Type" => resizer.content_type}).finish
+        headers = {
+          "Content-Type" => resizer.content_type,
+          'Cache-Control' => "public, max-age=#{days_to_seconds(14)}"
+        }
+        
+        Rack::Response.new(resizer.image_blob, 200, headers).finish
       rescue NoSuchImageException => e
         Rack::Response.new('The requested image was not found.', 404).finish
       end
+    end
+    
+    private
+    def days_to_seconds(days)
+      days * 24 * 60 * 60
     end
   end
 end
