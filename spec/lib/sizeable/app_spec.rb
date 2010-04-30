@@ -1,10 +1,10 @@
 require 'sizeable'
 
-describe Sizeable do
+describe Sizeable::App do
   describe "#call(env)" do
     context "lint tests" do
       before(:each) do
-        @response = Sizeable.new.call(mock(:env))
+        @response = Sizeable::App.new.call(mock(:env))
       end
 
       it "returns a valid status" do
@@ -26,6 +26,18 @@ describe Sizeable do
           body_line.should be_a(String)
         end
       end
+    end
+    
+    def request_path(path)
+      Sizeable::App.new.call({'PATH_INFO' => path})
+    end
+    
+    it "converts the requested path to a (potentially resized image)" do
+      path = mock(:path)
+      
+      
+      
+      request_path(path)
     end
   end
 end
