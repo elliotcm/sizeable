@@ -9,7 +9,7 @@ describe Sizeable::Resizer do
       
       @env = {'rack.input' => '', 'QUERY_STRING' => ''}
       
-      AWS::S3::S3Object.stub!(:find => mock(:s3_object, :value => ''))
+      AWS::S3::S3Object.stub!(:find => mock(:s3_object, :value => '', :content_type => ''))
       Magick::Image.stub!(:from_blob)
       
       AWS::S3::Base.stub!(:establish_connection!)
@@ -29,7 +29,8 @@ describe Sizeable::Resizer do
     context "if the image exists" do
       before(:each) do
         @blob = mock(:blob)
-        s3_object = mock(:s3_object, :value => @blob)
+        @content_type = mock(:content_type)
+        s3_object = mock(:s3_object, :value => @blob, :content_type => @content_type)
         AWS::S3::S3Object.stub!(:find).with(@path, anything).and_return(s3_object)
       end
       
@@ -38,6 +39,7 @@ describe Sizeable::Resizer do
 
         resizer = Sizeable::Resizer.new(Rack::Request.new(@env))
         resizer.instance_variable_get('@image').should == image
+        resizer.instance_variable_get('@content_type').should == @content_type
       end
     end
     
@@ -55,10 +57,6 @@ describe Sizeable::Resizer do
   end
   
   describe "#resize!" do
-    
-  end
-  
-  describe "#image_blob" do
     
   end
 end

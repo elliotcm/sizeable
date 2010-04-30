@@ -13,16 +13,16 @@ module Sizeable
         s3_object = AWS::S3::S3Object.find(image_name(request.path_info), s3_bucket)
         @image_blob = s3_object.value
         @image = Magick::Image.from_blob(@image_blob)
+        
+        @content_type = s3_object.content_type
       rescue AWS::S3::NoSuchKey => e
         raise NoSuchImageException.new
       end
     end
     
-    def resize!
-      
-    end
+    attr_reader :image_blob, :content_type
     
-    def image_blob
+    def resize!
       
     end
     

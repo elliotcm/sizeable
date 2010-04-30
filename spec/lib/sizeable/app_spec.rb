@@ -36,7 +36,7 @@ describe Sizeable::App do
 
     context "when a valid image is requested" do
       before(:each) do
-        Sizeable::Resizer.stub!(:new => mock(:resizer, :resize! => true, :image_blob => ''))
+        Sizeable::Resizer.stub!(:new => mock(:resizer, :resize! => true, :image_blob => '', :content_type => ''))
       end
     
       it_should_behave_like 'a valid rack app'
@@ -54,6 +54,11 @@ describe Sizeable::App do
       it "returns the new image as the body of the response" do
         @resizer.stub!(:image_blob => (@image_blob = mock(:image_blob).to_s))
         do_request[2].body.should == [@image_blob]
+      end
+
+      it "returns the content type of the new image in the headers of the response" do
+        @resizer.stub!(:content_type => (@content_type = mock(:content_type).to_s))
+        do_request[1]['Content-Type'].should == @content_type
       end
     end
     
