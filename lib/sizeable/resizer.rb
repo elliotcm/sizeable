@@ -8,10 +8,15 @@ module Sizeable
       @width = request.params['width'].to_i
       @height = request.params['height'].to_i
       
-      @image_blob = AWS::S3::S3Object.value(request.path_info, 'bucket_name')
-      @image = Magick::Image.from_blob(@image_blob)
-      
       connect_to_s3
+      
+      begin
+        s3_object = AWS::S3::S3Object.find(request.path_info, s3_bucket)
+        @image_blob = s3_object.value
+        @image = Magick::Image.from_blob(@image_blob)
+      rescue AWS::S3::NoSuchKey => e
+        raise NoSuchImageException.new
+      end
     end
     
     def resize!
@@ -29,5 +34,11 @@ module Sizeable
         :secret_access_key => ENV['S3_SECRET']
       )
     end
+    
+    def s3_bucket
+      ENV['S3_BUCKET']
+    end
   end
+  
+  class NoSuchImageException < StandardError; end
 end

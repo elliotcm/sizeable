@@ -6,10 +6,14 @@ require 'lib/sizeable/resizer'
 module Sizeable
   class App
     def call(env)
-      resizer = Resizer.new(Rack::Request.new(env))
-      resizer.resize!
-      
-      Rack::Response.new(resizer.image_blob).finish
+      begin
+        resizer = Resizer.new(Rack::Request.new(env))
+        resizer.resize!
+        
+        Rack::Response.new(resizer.image_blob).finish
+      rescue NoSuchImageException => e
+        Rack::Response.new('The requested image was not found.', 404).finish
+      end
     end
   end
 end
