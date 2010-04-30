@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'aws/s3'
-require 'rmagick'
+require 'RMagick'
 
 module Sizeable
   class Resizer
