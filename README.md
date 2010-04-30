@@ -5,7 +5,7 @@ Sizeable is a low profile Rack app designed to be deployed to Heroku.
 
 It acts as a utility application to handle the resizing of large image assets from S3 on the fly.
 
-Because Heroku employs industrial strength caching, does not charge for bandwidth from Heroku to the world and does not charge to talk to S3, this is a very low-cost, low-complexity and high-speed solution to asset resizing.
+Because Heroku employs industrial strength caching, does not charge for bandwidth from Heroku to the world and does not charge to talk to S3, this is a very low-cost, low-complexity and high-speed solution for asset resizing.
 
 Usage
 -----
