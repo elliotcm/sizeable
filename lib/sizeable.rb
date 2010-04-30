@@ -1,1 +1,1 @@
-require 'sizeable/app'
+require 'lib/sizeable/app'

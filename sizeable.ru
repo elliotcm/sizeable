@@ -2,4 +2,4 @@ require 'rack'
 require 'lib/sizeable'
 
 use Rack::ShowExceptions
-run Sizeable.new
+run Sizeable::App.new

@@ -1,10 +1,14 @@
-require 'sizeable'
+require 'sizeable/app'
 
 describe Sizeable::App do
   describe "#call(env)" do
+    before(:each) do
+      Sizeable::Resizer.stub!(:new => mock(:resizer, :resize! => true, :image_blob => ''))
+    end
+    
     context "lint tests" do
       before(:each) do
-        @response = Sizeable::App.new.call(mock(:env))
+        @response = Sizeable::App.new.call(mock(:env, :[] => {}))
       end
 
       it "returns a valid status" do
@@ -28,16 +32,27 @@ describe Sizeable::App do
       end
     end
     
-    def request_path(path)
-      Sizeable::App.new.call({'PATH_INFO' => path})
-    end
-    
-    it "converts the requested path to a (potentially resized image)" do
-      path = mock(:path)
+    context "image resizing" do
+      def request_path(path)
+        Sizeable::App.new.call({'PATH_INFO' => path})
+      end
       
-      
-      
-      request_path(path)
+      before(:each) do
+        @path = mock(:path)
+
+        @resizer = Sizeable::Resizer.new(@path)
+        Sizeable::Resizer.stub!(:new => @resizer)
+      end
+
+      it "converts the requested path to a (potentially resized) image" do
+        @resizer.should_receive(:resize!)
+        request_path(@path)
+      end
+
+      it "returns the new image as the body of the response" do
+        @resizer.stub!(:image_blob => (@image_blob = mock(:image_blob).to_s))
+        request_path(@path)[2].body.should == [@image_blob]
+      end
     end
   end
 end
