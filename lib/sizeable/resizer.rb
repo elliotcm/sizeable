@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'aws/s3'
 require 'RMagick'
 
