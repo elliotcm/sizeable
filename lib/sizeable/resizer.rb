@@ -31,13 +31,17 @@ module Sizeable
     private
     def connect_to_s3
       AWS::S3::Base.establish_connection!(
-        :access_key_id     => ENV['S3_KEY'],
-        :secret_access_key => ENV['S3_SECRET']
+        :access_key_id     => ENV['S3_KEY']    || s3_config[:aws_access_key_id],
+        :secret_access_key => ENV['S3_SECRET'] || s3_config[:aws_secret_access_key]
       )
     end
 
     def missing_boundary?
       @width.nil? or @height.nil? or @width == 0 or @height == 0
+    end
+
+    def s3_config
+      @s3_config ||= YAML.load_file(RACK_ROOT + '/config/ec2.yml')
     end
   end
 

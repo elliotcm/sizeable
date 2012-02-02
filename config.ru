@@ -1,4 +1,5 @@
-$LOAD_PATH << File.dirname(__FILE__)
+RACK_ROOT = File.dirname(__FILE__)
+$LOAD_PATH << RACK_ROOT
 
 require "rubygems"
 require "bundler/setup"
