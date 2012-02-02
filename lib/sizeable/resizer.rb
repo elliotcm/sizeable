@@ -3,7 +3,7 @@ require 'RMagick'
 
 module Sizeable
   class Resizer
-    def initialize(s3_bucket, image_name, width, height)
+    def initialize(s3_bucket, image_name, options={})
       connect_to_s3
       begin
         s3_object = AWS::S3::S3Object.find(image_name, s3_bucket)
@@ -16,8 +16,8 @@ module Sizeable
         raise NoSuchImageException
       end
 
-      @width = width
-      @height = height
+      @width = options[:width]
+      @height = options[:height]
     end
 
     attr_reader :image_blob, :content_type

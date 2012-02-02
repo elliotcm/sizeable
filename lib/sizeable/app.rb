@@ -37,14 +37,17 @@ module Sizeable
 
       s3_bucket = preset_s3_bucket || parts.shift
 
-      if parts[-2] =~ /^(\d+)x(\d+)$/
-        parts.delete_at(-2)
-        width, height = $1, $2
+      options = {}
+      parts.each_with_index do |part, index|
+        if part =~ /^(\d+)x(\d+)$/
+          parts.delete_at(index)
+          options.merge!(:width => $1, :height => $2)
+        end
       end
 
       image_name = parts.join('/')
 
-      return [s3_bucket, image_name, width, height]
+      return [s3_bucket, image_name, options]
     end
 
     def preset_s3_bucket
