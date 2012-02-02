@@ -3,6 +3,7 @@ require 'RMagick'
 
 module Sizeable
   class Resizer
+
     def initialize(s3_bucket, image_name, options={})
       connect_to_s3
       begin
@@ -28,7 +29,8 @@ module Sizeable
       @image_blob = @image.to_blob
     end
 
-    private
+  protected
+
     def connect_to_s3
       AWS::S3::Base.establish_connection!(
         :access_key_id     => ENV['S3_KEY']    || s3_config[:aws_access_key_id],
@@ -43,6 +45,7 @@ module Sizeable
     def s3_config
       @s3_config ||= YAML.load_file(RACK_ROOT + '/config/ec2.yml')
     end
+
   end
 
   class NoSuchImageException < StandardError; end
