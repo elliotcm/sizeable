@@ -10,6 +10,7 @@ module Sizeable
       begin
         resizer = Resizer.new(*parse_request(env))
         resizer.resize!
+        resizer.reflect!
 
         headers = {
           "Content-Type" => resizer.content_type,
@@ -39,13 +40,16 @@ module Sizeable
 
       options = {}
       parts.each_with_index do |part, index|
-        if part =~ /^(\d+)x(\d+)$/
-          parts.delete_at(index)
+        if part == 'reflect'
+          parts[index] = nil
+          options[:reflect] = true
+        elsif part =~ /^(\d+)x(\d+)$/
+          parts[index] = nil
           options.merge!(:width => $1, :height => $2)
         end
       end
 
-      image_name = parts.join('/')
+      image_name = parts.compact.join('/')
 
       return [s3_bucket, image_name, options]
     end
