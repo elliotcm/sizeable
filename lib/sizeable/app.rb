@@ -20,6 +20,8 @@ module Sizeable
         Rack::Response.new(resizer.image_blob, 200, headers).finish
       rescue NoSuchImageException
         Rack::Response.new('The requested image was not found.', 404).finish
+      rescue
+        Rack::Response.new('There was an error requesting your image.  Please check the URL and try again.', 500).finish
       end
     end
 
