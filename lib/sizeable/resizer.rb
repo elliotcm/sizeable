@@ -34,17 +34,9 @@ module Sizeable
       @image.format = 'PNG'
       @content_type = @image.mime_type
 
-      mask = Magick::Image.new(@image.columns, @image.rows, Magick::GradientFill.new(0, 0, @image.columns, 0, "white", "black"))
-      mask.matte = false
-
-      reflection = @image.flip
-      reflection.matte = true
-
-      reflection.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
-
       components = Magick::ImageList.new
       components << @image
-      components << reflection
+      components << @image.wet_floor(0.3)
 
       @image = components.append(true)
     end
