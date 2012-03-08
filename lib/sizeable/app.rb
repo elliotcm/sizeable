@@ -3,6 +3,8 @@ require 'rack/request'
 
 require 'lib/sizeable/resizer'
 
+require 'time'
+
 module Sizeable
   class App
 
@@ -14,7 +16,8 @@ module Sizeable
 
         headers = {
           "Content-Type" => resizer.content_type,
-          'Cache-Control' => "public, max-age=#{days_to_seconds(14)}"
+          'Cache-Control' => "public, max-age=#{days_to_seconds(14)}",
+          'Last-Modified' => resizer.last_modified.httpdate
         }
 
         Rack::Response.new(resizer.image_blob, 200, headers).finish
