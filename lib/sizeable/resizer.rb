@@ -11,7 +11,8 @@ module Sizeable
 
         @image = Magick::Image.from_blob(s3_object.value).first
 
-        @content_type = s3_object.content_type
+        @content_type  = s3_object.content_type
+        @last_modified = s3_object.last_modified
       rescue AWS::S3::NoSuchBucket, AWS::S3::NoSuchKey
         raise NoSuchImageException
       end
@@ -21,7 +22,7 @@ module Sizeable
       @height = options[:height]
     end
 
-    attr_reader :content_type
+    attr_reader :content_type, :last_modified
 
     def resize!
       return if missing_boundary?
