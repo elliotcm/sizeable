@@ -39,7 +39,7 @@ module Sizeable
 
       parts = request.path_info.split('/').reject{|str| str.nil? or str == ''}
 
-      raise NoSuchImageException if parts.length < 2
+      raise NoSuchImageException if parts.length < 2 unless preset_s3_bucket
 
       s3_bucket = preset_s3_bucket || parts.shift
 
