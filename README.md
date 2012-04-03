@@ -22,7 +22,9 @@ When you feed your images out into your primary app, simply add the S3 path to t
 
 For example, if your Sizeable app is deployed to `images.example.com` and you have an image on S3 called `frying-pan.jpg` in the directory `cookware`, provide your users with the URL `http://images.example.com/cookware/frying-pan.jpg`.
 
-To limit that image to 100px tall by 75px wide while maintaining aspect ratio, you would use `http://images.example.com/cookware/frying-pan.jpg?height=100&width=75`.
+To limit that image to 75px wide by 100px tall while maintaining aspect ratio, you would use `http://images.example.com/cookware/75x100/frying-pan.jpg`.
+
+You can also specify a bucket in the URL, for example `http://images.example.com/cookware-images/cookware/75x100/frying-pan.jpg`
 
 All images are cached for 14 days.
 
