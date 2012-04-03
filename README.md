@@ -1,36 +1,50 @@
-Sizeable
-========
+# Sizeable
 
-Sizeable is a low profile Rack app designed to be deployed to Heroku.
+Sizeable is a low profile Rack app designed to be deployed to [Heroku](http://heroku.com/) which acts as a utility application to handle the resizing of large image assets from S3 on the fly.
 
-It acts as a utility application to handle the resizing of large image assets from S3 on the fly.
+Since Heroku employs industrial strength caching; does not charge for bandwidth from Heroku to the world; and does not charge to talk to S3; this is a very low-cost, low-complexity and high-speed solution for asset resizing.
 
-Because Heroku employs industrial strength caching, does not charge for bandwidth from Heroku to the world and does not charge to talk to S3, this is a very low-cost, low-complexity and high-speed solution for asset resizing.
+## Setup
 
-Usage
------
-
-Deploy a copy of the app to [Heroku](http://heroku.com/).  You'll need to deploy to the [Aspen stack](http://docs.heroku.com/stack) and use the `.gems` manifest instead of a `Gemfile` for RMagick's sake.
+Deploy a copy of the app to Heroku.  A simple `heroku apps:create [app-name]` will put you on the supported Bamboo 1.9.2 stack.  Other stacks are currently untested.
 
 Set up your S3 credentials.  You'll need to set the following [config variables](http://docs.heroku.com/config-vars):
 
 * S3_KEY
 * S3_SECRET
-* S3_BUCKET
+* S3_BUCKET (optional, you can override the bucket name in the URL)
 
-When you feed your images out into your primary app, simply add the S3 path to the image onto the end of the URL to your Sizeable app.
+## Usage
+### Basic
 
-For example, if your Sizeable app is deployed to `images.example.com` and you have an image on S3 called `frying-pan.jpg` in the directory `cookware`, provide your users with the URL `http://images.example.com/cookware/frying-pan.jpg`.
+If your Sizeable app is deployed to `images.example.com` and you have an image on S3 called `frying-pan.jpg` in the directory `cookware`, the basic form would be:
 
-To limit that image to 75px wide by 100px tall while maintaining aspect ratio, you would use `http://images.example.com/cookware/75x100/frying-pan.jpg`.
+      http://images.exmaple.com/cookware/frying-pan.jpg
 
-You can also specify a bucket in the URL, for example `http://images.example.com/cookware-images/cookware/75x100/frying-pan.jpg`
+### Additional params
+
+Sizeable also performs resizing and web 2.0 reflection if requested:
+
+      http://images.example.com/additional-assets/more-cookware/reflect/70x70/fancy-frying-pan.png
+            S3 bucket ----------------^                           |      ^-------- dimensions (optional)
+    (optional if you provided a bucket via config vars)           ^----------- reflection (optional)
+
+Parameters can be provided anywhere in the URL, with the exception of the bucket name.
+
+## Concurrency
+
+Browsers limit the number of asset requests per host, sometimes as low as 2.  If you have many images being loaded from the same host in your page, requests will start blocking and increasing your page load time.
+
+This can be resolved by spreading the images over many hosts.  Sizeable can't do this for you automatically, but it can help.
+
+If you're finding your assets are blocking, try cycling through 3 or 4 hosts, for example:
+
+* images1.example.com
+* images2.example.com
+* images3.example.com
+
+Since browsers don't require each host to be on a different IP for concurrent requests to take place, the quickest way to implement this on Heroku is to create these hosts as CNAMEs to your main app, and increase your [dyno count](https://devcenter.heroku.com/articles/dynos) to compensate.  Alternatively, you could deploy multiple Heroku apps, one for each host.
+
+## Caching
 
 All images are cached for 14 days.
-
-To pay or not to pay
---------------------
-
-Sizeable will work perfectly well on a Heroku free app, but if your site has even moderate concurrency you're going to have to deal with that somehow.
-
-You could run up a few free apps and round-robin from your primary application, but this requires added complexity and maintenance overheads.  Your apps will also not share a cache, so your users could experience some additional slow-loading pages.
