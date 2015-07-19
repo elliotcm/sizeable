@@ -1,5 +1,5 @@
 require 'aws/s3'
-require 'RMagick'
+require 'rmagick'
 
 module Sizeable
   class Resizer
