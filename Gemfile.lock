@@ -1,15 +1,15 @@
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
-    aws-s3 (0.6.2)
+    aws-s3 (0.6.3)
       builder
       mime-types
       xml-simple
-    builder (3.0.0)
-    mime-types (1.17.2)
-    rack (1.4.0)
-    rmagick (2.13.1)
-    xml-simple (1.1.1)
+    builder (3.2.2)
+    mime-types (2.6.1)
+    rack (1.6.4)
+    rmagick (2.15.2)
+    xml-simple (1.1.5)
 
 PLATFORMS
   ruby
@@ -18,3 +18,6 @@ DEPENDENCIES
   aws-s3
   rack
   rmagick
+
+BUNDLED WITH
+   1.10.5
